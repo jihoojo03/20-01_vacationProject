@@ -1,19 +1,26 @@
 package calculator_01;
 
+import java.math.*;
+import java.text.DecimalFormat;
+
 public class Calculate {
+	private String currentEquation;
 	private String currentValue;
-	private float intermediateResult;
-	private float calculationResult;
+	private String beforeCurrentValue;
+	private double intermediateResult;
+	private double calculationResult;
 	private boolean intermediateStored;
 	private boolean symbolClicked;
 	private boolean plusClicked;
 	private boolean minusClicked;
 	private boolean multipleClicked;
 	private boolean divideClicked;
-	private boolean dotClicked;
+	private boolean equalClicked;
 	
 	Calculate(){
-		currentValue = "";
+		currentEquation = "";
+		currentValue = "0";
+		beforeCurrentValue = "";
 		intermediateResult = 0;
 		calculationResult = 0;
 		intermediateStored = false;
@@ -22,7 +29,16 @@ public class Calculate {
 		minusClicked = false;
 		multipleClicked = false;
 		divideClicked = false;
-		dotClicked = false;
+		equalClicked = false;
+	}
+
+
+	public String getCurrentEquation() {
+		return currentEquation;
+	}
+
+	public void setCurrentEquation(String currentEquation) {
+		this.currentEquation = currentEquation;
 	}
 
 	public String getCurrentValue() {
@@ -33,15 +49,23 @@ public class Calculate {
 		this.currentValue = currentValue;
 	}
 	
-	public float getIntermediateResult() {
+	public String getBeforeCurrentValue() {
+		return beforeCurrentValue;
+	}
+
+	public void setBeforeCurrentValue(String beforeCurrentValue) {
+		this.beforeCurrentValue = beforeCurrentValue;
+	}
+
+	public double getIntermediateResult() {
 		return intermediateResult;
 	}
 
-	public void setIntermediateResult(float intermediateResult) {
+	public void setIntermediateResult(double intermediateResult) {
 		this.intermediateResult = intermediateResult;
 	}
 
-	public float getCalculationResult() {
+	public double getCalculationResult() {
 		return calculationResult;
 	}
 
@@ -97,12 +121,19 @@ public class Calculate {
 		this.divideClicked = divideClicked;
 	}
 
-	public boolean isDotClicked() {
-		return dotClicked;
+	public boolean isEqualClicked() {
+		return equalClicked;
 	}
 
-	public void setDotClicked(boolean dotClicked) {
-		this.dotClicked = dotClicked;
+	public void setEqualClicked(boolean equalClicked) {
+		this.equalClicked = equalClicked;
+	}
+	
+	public void plusCurrentEquation(String currentEquation, String symbol) {
+		this.currentEquation += " ";
+		this.currentEquation += currentEquation;
+		this.currentEquation += " ";
+		this.currentEquation += symbol;
 	}
 
 	public void plusCurrentValue(String currentValue) {
@@ -117,42 +148,62 @@ public class Calculate {
 		}
 	}
 
-	public String changePlusMinus() {
-		if(!currentValue.equals("")) {
-			float num = Float.parseFloat(currentValue);
-			num = (-num);
-			return Float.toString(num);
+	public String changePlusMinus(String inputNum) {
+		if(!inputNum.equals("")) {
+			double num = Float.parseFloat(inputNum);
+			return fmt(-num);
 		}
 		else return "";
 	}
 	
 	public String deleteValue() {
-		if(!currentValue.equals("")) {
+		if(!currentValue.equals("0")) {
+			return currentValue.substring(0, currentValue.length()-1);
+		}
+		else return "";
+	}
+	
+	public String deleteEquation() {
+		if(!currentEquation.equals("")) {
 			return currentValue.substring(0, currentValue.length()-1);
 		}
 		else return "";
 	}
 	
 	public String calculateAnswer() {
+		DecimalFormat fm = new DecimalFormat("#.########");
+		
 		if(plusClicked) {
-			calculationResult = intermediateResult + Float.parseFloat(currentValue);
+			BigDecimal a = BigDecimal.valueOf(intermediateResult);
+			BigDecimal b = BigDecimal.valueOf(Float.parseFloat(currentValue));
+			BigDecimal c = a.add(b, MathContext.DECIMAL32);
+			calculationResult = (c.setScale(12, RoundingMode.HALF_UP)).doubleValue();
 			intermediateResult = calculationResult;
-			return fmt(calculationResult);
+			return fm.format(calculationResult);
 		}
 		else if(minusClicked) {
-			calculationResult = intermediateResult - Float.parseFloat(currentValue);
+			BigDecimal a = BigDecimal.valueOf(intermediateResult);
+			BigDecimal b = BigDecimal.valueOf(Float.parseFloat(currentValue));
+			BigDecimal c = a.subtract(b, MathContext.DECIMAL32);
+			calculationResult = (c.setScale(12, RoundingMode.HALF_UP)).doubleValue();
 			intermediateResult = calculationResult;
-			return fmt(calculationResult);
+			return fm.format(calculationResult);
 		}
 		else if(multipleClicked) {
-			calculationResult = intermediateResult * Float.parseFloat(currentValue);
+			BigDecimal a = BigDecimal.valueOf(intermediateResult);
+			BigDecimal b = BigDecimal.valueOf(Float.parseFloat(currentValue));
+			BigDecimal c = a.multiply(b, MathContext.DECIMAL32);
+			calculationResult = (c.setScale(12, RoundingMode.HALF_UP)).doubleValue();
 			intermediateResult = calculationResult;
-			return fmt(calculationResult);
+			return fm.format(calculationResult);
 		}
 		else if(divideClicked) {
-			calculationResult = intermediateResult / Float.parseFloat(currentValue);
+			BigDecimal a = BigDecimal.valueOf(intermediateResult);
+			BigDecimal b = BigDecimal.valueOf(Float.parseFloat(currentValue));
+			BigDecimal c = a.divide(b, MathContext.DECIMAL32);
+			calculationResult = (c.setScale(12, RoundingMode.HALF_UP)).doubleValue();
 			intermediateResult = calculationResult;
-			return fmt(calculationResult);
+			return fm.format(calculationResult);
 		}
 		else {
 			return currentValue;
@@ -160,7 +211,16 @@ public class Calculate {
 		
 	}
 	
-	public static String fmt(float d) {
+	public String lastSymbol() {
+		if(plusClicked) return "+";
+		else if(minusClicked) return "¡ª";
+		else if(multipleClicked) return "¡¿";
+		else if(divideClicked) return "¡À";
+		else return "";
+	}
+	
+
+	public String fmt(double d) {
 		if(d == (long) d)
 			return String.format("%d", (long)d);
 		else

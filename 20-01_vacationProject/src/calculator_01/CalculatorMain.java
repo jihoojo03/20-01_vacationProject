@@ -2,7 +2,7 @@ package calculator_01;
 
 public class CalculatorMain {
 	
-	public static final int SCREEN_WIDTH = 350;
+	public static final int SCREEN_WIDTH = 550;
 	public static final int SCREEN_HEIGHT = 490;
 
 	public static void main(String[] args) {

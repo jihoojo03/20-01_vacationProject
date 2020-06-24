@@ -14,58 +14,45 @@ public class GUITest extends JFrame {
 	private ImageIcon numButtonEnteredImage = new ImageIcon(CalculatorMain.class.getResource("../images/numButtonEntered.png"));
 	private ImageIcon equalButtonBasicImage = new ImageIcon(CalculatorMain.class.getResource("../images/equalButton.png"));
 	private ImageIcon equalButtonEnteredImage = new ImageIcon(CalculatorMain.class.getResource("../images/equalButtonEntered.png"));
-
-	private String numText01 = "1";
-	private String numText02 = "2";
-	private String numText03 = "3";
-	private String numText04 = "4";
-	private String numText05 = "5";
-	private String numText06 = "6";
-	private String numText07 = "7";
-	private String numText08 = "8";
-	private String numText09 = "9";
-	private String numText00 = "0";
-	private String numTextPlusMinus = "±";
-	private String numTextDot = ".";
+	private ImageIcon containerBasicImage = new ImageIcon(CalculatorMain.class.getResource("../images/containButton.png"));
+	private ImageIcon containerEnteredImage = new ImageIcon(CalculatorMain.class.getResource("../images/containButtonEntered.png"));
+	private ImageIcon trashbinImage = new ImageIcon(CalculatorMain.class.getResource("../images/trashbin.png"));
 	
-	private String symbolTextCE = "CE";
-	private String symbolTextC = "C";
-	private String symbolTextBack = "←";
-	private String symbolTextDivide = "÷";
-	private String symbolTextMultiple = "×";
-	private String symbolTextMinus = "―";
-	private String symbolTextPlus = "+";
+	private JButton numButton01 = new JButton("1", numButtonBasicImage);
+	private JButton numButton02 = new JButton("2", numButtonBasicImage);
+	private JButton numButton03 = new JButton("3", numButtonBasicImage);
+	private JButton numButton04 = new JButton("4", numButtonBasicImage);
+	private JButton numButton05 = new JButton("5", numButtonBasicImage);
+	private JButton numButton06 = new JButton("6", numButtonBasicImage);
+	private JButton numButton07 = new JButton("7", numButtonBasicImage);
+	private JButton numButton08 = new JButton("8", numButtonBasicImage);
+	private JButton numButton09 = new JButton("9", numButtonBasicImage);
+	private JButton numButton00 = new JButton("0", numButtonBasicImage);
+	private JButton numButtonPlusMinus = new JButton("±", numButtonBasicImage);
+	private JButton numButtonDot = new JButton(".", numButtonBasicImage);
 	
-	private String equalText = "=";
+	private JButton symbolButtonCE = new JButton("CE", symbolButtonBasicImage);
+	private JButton symbolButtonC = new JButton("C", symbolButtonBasicImage);
+	private JButton symbolButtonBack = new JButton("←", symbolButtonBasicImage);
+	private JButton symbolButtonDivide = new JButton("÷", symbolButtonBasicImage);
+	private JButton symbolButtonMultiple = new JButton("×", symbolButtonBasicImage);
+	private JButton symbolButtonMinus = new JButton("―", symbolButtonBasicImage);
+	private JButton symbolButtonPlus = new JButton("+", symbolButtonBasicImage);
 	
-	private JButton numButton01 = new JButton(numText01, numButtonBasicImage);
-	private JButton numButton02 = new JButton(numText02, numButtonBasicImage);
-	private JButton numButton03 = new JButton(numText03, numButtonBasicImage);
-	private JButton numButton04 = new JButton(numText04, numButtonBasicImage);
-	private JButton numButton05 = new JButton(numText05, numButtonBasicImage);
-	private JButton numButton06 = new JButton(numText06, numButtonBasicImage);
-	private JButton numButton07 = new JButton(numText07, numButtonBasicImage);
-	private JButton numButton08 = new JButton(numText08, numButtonBasicImage);
-	private JButton numButton09 = new JButton(numText09, numButtonBasicImage);
-	private JButton numButton00 = new JButton(numText00, numButtonBasicImage);
-	private JButton numButtonPlusMinus = new JButton(numTextPlusMinus, numButtonBasicImage);
-	private JButton numButtonDot = new JButton(numTextDot, numButtonBasicImage);
+	private JButton equalButton = new JButton("=", equalButtonBasicImage);
 	
-	private JButton symbolButtonCE = new JButton(symbolTextCE, symbolButtonBasicImage);
-	private JButton symbolButtonC = new JButton(symbolTextC, symbolButtonBasicImage);
-	private JButton symbolButtonBack = new JButton(symbolTextBack, symbolButtonBasicImage);
-	private JButton symbolButtonDivide = new JButton(symbolTextDivide, symbolButtonBasicImage);
-	private JButton symbolButtonMultiple = new JButton(symbolTextMultiple, symbolButtonBasicImage);
-	private JButton symbolButtonMinus = new JButton(symbolTextMinus, symbolButtonBasicImage);
-	private JButton symbolButtonPlus = new JButton(symbolTextPlus, symbolButtonBasicImage);
+	private JButton[] containButton = new JButton[5];
+	private JButton trashbinButton = new JButton(trashbinImage);
 	
-	private JButton equalButton = new JButton(equalText, equalButtonBasicImage);
-	
+	private JLabel equationBox = new JLabel();
 	private JLabel calculateBox = new JLabel();
 	
-	
-	Calculate calculate = new Calculate();
+	private JLabel containBox = new JLabel();
+	private JLabel answerBox = new JLabel();
 
+	Calculate calculate = new Calculate();
+	Container container = new Container();
+	
 	
 	GUITest() {
 		setTitle("Calculator");
@@ -81,9 +68,9 @@ public class GUITest extends JFrame {
 		makeEqual();
 		setText();
 		setValueText();
+		setEquationText();
+		makeContainer();
 	}
-	
-	
 	
 	public void makeNum() {
 		numButtonPlusMinus.setBounds(5, 385, 80, 70);
@@ -105,8 +92,16 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				calculate.setCurrentValue(calculate.changePlusMinus());
-				setValueText();
+				if(calculate.isEqualClicked()) {
+					calculate.setCurrentValue(calculate.changePlusMinus(Double.toString(calculate.getIntermediateResult())));
+					calculate.setIntermediateResult(Double.parseDouble(calculate.getCurrentValue()));
+					setValueText();
+				}
+				else {
+					calculate.setCurrentValue(calculate.changePlusMinus(calculate.getCurrentValue()));
+					setValueText();
+				}
+		
 			}
 		});
 		add(numButtonPlusMinus);
@@ -157,7 +152,6 @@ public class GUITest extends JFrame {
 			public void mousePressed(MouseEvent e) {
 				calculate.plusCurrentValue(".");
 				setValueText();
-				calculate.setDotClicked(true);
 			}
 		});
 		add(numButtonDot);
@@ -417,11 +411,24 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				calculate.setCurrentValue("");
-				calculate.setSymbolClicked(false);
-				calculate.setDotClicked(false);
-				calculate.setIntermediateStored(false);
-				setValueText();
+				if(calculate.isEqualClicked()) {
+					calculate.setCurrentEquation("");
+					calculate.setCurrentValue("0");
+					calculate.setSymbolClicked(false);
+					calculate.setEqualClicked(false);
+					calculate.setIntermediateStored(false);
+					calculate.setPlusClicked(false);
+					calculate.setMinusClicked(false);
+					calculate.setDivideClicked(false);
+					calculate.setMultipleClicked(false);
+					setValueText();
+					setEquationText();
+				}
+				else {
+					calculate.setCurrentValue("");
+					setValueText();
+				}
+
 			}
 		});
 		add(symbolButtonCE);
@@ -445,11 +452,17 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				calculate.setCurrentValue("");
+				calculate.setCurrentEquation("");
+				calculate.setCurrentValue("0");
 				calculate.setSymbolClicked(false);
-				calculate.setDotClicked(false);
+				calculate.setEqualClicked(false);
 				calculate.setIntermediateStored(false);
+				calculate.setPlusClicked(false);
+				calculate.setMinusClicked(false);
+				calculate.setDivideClicked(false);
+				calculate.setMultipleClicked(false);
 				setValueText();
+				setEquationText();
 			}
 		});
 		add(symbolButtonC);
@@ -473,8 +486,15 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				calculate.setCurrentValue(calculate.deleteValue());
-				setValueText();
+				if(calculate.isEqualClicked()) {
+					calculate.setCurrentEquation("");
+					setEquationText();
+				}
+				else {
+					calculate.setCurrentValue(calculate.deleteValue());
+					setValueText();
+				}
+				
 			}
 		});
 		add(symbolButtonBack);
@@ -498,14 +518,29 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if(calculate.isEqualClicked()) {
+					calculate.setCurrentEquation("");
+					calculate.plusCurrentEquation(calculate.fmt(calculate.getIntermediateResult()), "÷");
+					setEquationText();
+					calculate.setIntermediateResult(Double.parseDouble(calculate.getCurrentValue()));
+					calculate.setEqualClicked(false);
+				}
+				else {
+					calculate.plusCurrentEquation(calculate.getCurrentValue(), "÷");
+					setEquationText();
+				}
+				
 				if(calculate.isIntermediateStored()) {
 					calculate.setCurrentValue(calculate.calculateAnswer());
 					calculate.setIntermediateResult(Float.parseFloat(calculate.getCurrentValue()));
 					setValueText();
+					calculate.setIntermediateStored(false);
 				}
 				else {
+					
 					calculate.setIntermediateResult(Float.parseFloat(calculate.getCurrentValue()));
 				}
+				
 				calculate.setSymbolClicked(true);
 				calculate.setPlusClicked(false);
 				calculate.setMinusClicked(false);
@@ -536,14 +571,30 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if(calculate.isEqualClicked()) {
+					calculate.setCurrentEquation("");
+					calculate.plusCurrentEquation(calculate.fmt(calculate.getIntermediateResult()), "×");
+					setEquationText();
+					calculate.setIntermediateResult(Double.parseDouble(calculate.getCurrentValue()));
+					calculate.setEqualClicked(false);
+					setValueText();
+				}
+				else {
+					calculate.plusCurrentEquation(calculate.getCurrentValue(), "×");
+					setEquationText();
+				}
+				
 				if(calculate.isIntermediateStored()) {
 					calculate.setCurrentValue(calculate.calculateAnswer());
 					calculate.setIntermediateResult(Float.parseFloat(calculate.getCurrentValue()));
 					setValueText();
+					calculate.setIntermediateStored(false);
 				}
 				else {
 					calculate.setIntermediateResult(Float.parseFloat(calculate.getCurrentValue()));
+					setValueText();
 				}
+				
 				calculate.setSymbolClicked(true);
 				calculate.setPlusClicked(false);
 				calculate.setMinusClicked(false);
@@ -573,14 +624,29 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if(calculate.isEqualClicked()) {
+					calculate.setCurrentEquation("");
+					calculate.plusCurrentEquation(calculate.fmt(calculate.getIntermediateResult()), "-");
+					setEquationText();
+					calculate.setIntermediateResult(Double.parseDouble(calculate.getCurrentValue()));
+					calculate.setEqualClicked(false);
+				}
+				else {
+					calculate.plusCurrentEquation(calculate.getCurrentValue(), "-");
+					setEquationText();
+				}
+				
 				if(calculate.isIntermediateStored()) {
 					calculate.setCurrentValue(calculate.calculateAnswer());
 					calculate.setIntermediateResult(Float.parseFloat(calculate.getCurrentValue()));
 					setValueText();
+					calculate.setIntermediateStored(false);
 				}
 				else {
+					
 					calculate.setIntermediateResult(Float.parseFloat(calculate.getCurrentValue()));
 				}
+				
 				calculate.setSymbolClicked(true);
 				calculate.setPlusClicked(false);
 				calculate.setMinusClicked(true);
@@ -588,6 +654,9 @@ public class GUITest extends JFrame {
 				calculate.setDivideClicked(false);
 				calculate.setIntermediateStored(true);
 			}
+					
+				
+			
 		});
 		add(symbolButtonMinus);
 		
@@ -610,20 +679,38 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
+
+				if(calculate.isEqualClicked()) {
+					calculate.setCurrentEquation("");
+					calculate.plusCurrentEquation(calculate.fmt(calculate.getIntermediateResult()), "+");
+					setEquationText();
+					System.out.println(calculate.getCurrentValue() + "  " + calculate.getIntermediateResult());
+					calculate.setEqualClicked(false);
+				}
+				else {
+					calculate.plusCurrentEquation(calculate.getCurrentValue(), "+");
+					setEquationText();
+				}
+				
 				if(calculate.isIntermediateStored()) {
 					calculate.setCurrentValue(calculate.calculateAnswer());
 					calculate.setIntermediateResult(Float.parseFloat(calculate.getCurrentValue()));
 					setValueText();
+					calculate.setIntermediateStored(false);
+					System.out.println("wdv");
 				}
 				else {
 					calculate.setIntermediateResult(Float.parseFloat(calculate.getCurrentValue()));
+					System.out.println("asdf");
 				}
+				
 				calculate.setSymbolClicked(true);
 				calculate.setPlusClicked(true);
 				calculate.setMinusClicked(false);
 				calculate.setMultipleClicked(false);
 				calculate.setDivideClicked(false);
 				calculate.setIntermediateStored(true);
+				System.out.println(calculate.getCurrentValue() + "  " + calculate.getIntermediateResult());
 			}
 		});
 		add(symbolButtonPlus);
@@ -650,9 +737,35 @@ public class GUITest extends JFrame {
 			}
 
 			@Override
-			public void mousePressed(MouseEvent e) {
+			public void mousePressed(MouseEvent e) {	// = 눌렀을 때 계속해서 연산을 이어나가는 것도 신경써야 함
+				
+				if(calculate.isEqualClicked()) {
+					calculate.setCurrentEquation("");
+					if(calculate.isPlusClicked() || calculate.isMinusClicked() || calculate.isMultipleClicked() || calculate.isDivideClicked())
+						calculate.plusCurrentEquation(calculate.fmt(calculate.getIntermediateResult()), calculate.lastSymbol());
+					calculate.plusCurrentEquation(calculate.getCurrentValue(), "=");
+					setEquationText();
+				}
+				else {
+					calculate.plusCurrentEquation(calculate.getCurrentValue(), "=");
+					setEquationText();
+				}
+				
+				calculate.setEqualClicked(true);
+				calculate.setBeforeCurrentValue(calculate.getCurrentValue());
 				calculate.setCurrentValue(calculate.calculateAnswer());
+				calculate.setIntermediateStored(false);
+				calculate.setIntermediateResult(Double.parseDouble(calculate.getCurrentValue()));
 				setValueText();
+				calculate.setCurrentValue(calculate.getBeforeCurrentValue());
+				calculate.setBeforeCurrentValue(Double.toString(calculate.getIntermediateResult()));
+			
+				
+				container.saveEquationList(calculate.getCurrentEquation());
+				container.saveAnswerList(calculate.fmt(calculate.getIntermediateResult()));
+				setContainerText();
+				
+				
 			}
 		});
 		add(equalButton);
@@ -742,13 +855,192 @@ public class GUITest extends JFrame {
 	}
 
 	public void setValueText() {
+		System.out.println(calculate.getCurrentValue());
 		calculateBox.setText(calculate.getCurrentValue());
 		calculateBox.setVerticalAlignment(SwingConstants.CENTER);
 		calculateBox.setHorizontalAlignment(SwingConstants.RIGHT);
-		calculateBox.setBounds(0, 5, 320, 80);
+		calculateBox.setBounds(0, 30, 320, 40);
 		calculateBox.setFont(new Font("Serif", Font.BOLD, 30));
 		calculateBox.setForeground(Color.BLACK);
 		add(calculateBox);
+	}
+	
+	public void setEquationText() {
+		equationBox.setText(calculate.getCurrentEquation());
+		equationBox.setVerticalAlignment(SwingConstants.CENTER);
+		equationBox.setHorizontalAlignment(SwingConstants.RIGHT);
+		equationBox.setBounds(0, 10, 320, 20);
+		equationBox.setFont(new Font("Serif", Font.PLAIN, 15));
+		equationBox.setForeground(Color.BLACK);
+		add(equationBox);
+		
+	}
+	
+	public void makeContainer() {
+		for(int i = 0; i < 5; i++) {
+			containButton[i] = new JButton(containerBasicImage);
+			containButton[i].setBorderPainted(false);
+			containButton[i].setContentAreaFilled(false);
+			containButton[i].setFocusPainted(false);
+		}
+		
+		containButton[0].setBounds(345, 85, 200, 70);
+		containButton[0].addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				containButton[0].setIcon(containerEnteredImage);
+				containButton[0].setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				containButton[0].setIcon(containerBasicImage);
+				containButton[0].setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {	
+				int currentNum = container.getStartNum();
+				calculate.setCurrentEquation(container.getAnswerListToNum(currentNum));
+				calculate.setCurrentValue(container.getAnswerListToNum(currentNum));
+				calculate.setIntermediateResult(Double.parseDouble(container.getAnswerListToNum(currentNum)));
+				setValueText();
+				setEquationText();
+			}
+		});
+		add(containButton[0]);
+		
+		containButton[1].setBounds(345, 160, 200, 70);
+		containButton[1].addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				containButton[1].setIcon(containerEnteredImage);
+				containButton[1].setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				containButton[1].setIcon(containerBasicImage);
+				containButton[1].setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {	
+				
+				
+			}
+		});
+		add(containButton[1]);
+		
+		containButton[2].setBounds(345, 235, 200, 70);
+		containButton[2].addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				containButton[2].setIcon(containerEnteredImage);
+				containButton[2].setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				containButton[2].setIcon(containerBasicImage);
+				containButton[2].setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {	
+				
+				
+			}
+		});
+		add(containButton[2]);
+		
+		containButton[3].setBounds(345, 310, 200, 70);
+		containButton[3].addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				containButton[3].setIcon(containerEnteredImage);
+				containButton[3].setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				containButton[3].setIcon(containerBasicImage);
+				containButton[3].setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {	
+				
+				
+			}
+		});
+		add(containButton[3]);
+		
+		
+		containButton[4].setBounds(345, 385, 200, 70);
+		containButton[4].addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				containButton[4].setIcon(containerEnteredImage);
+				containButton[4].setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				containButton[4].setIcon(containerBasicImage);
+				containButton[4].setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {	
+				
+				
+			}
+		});
+		add(containButton[4]);
+		
+		trashbinButton.setBounds(510, 50, 35, 35);
+		trashbinButton.setBorderPainted(false);
+		trashbinButton.setContentAreaFilled(false);
+		trashbinButton.setFocusPainted(false);
+		trashbinButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				trashbinButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				trashbinButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {	
+				container.clearList();
+				setContainerText();
+			}
+		});
+		add(trashbinButton);
+	}
+	
+	public void setContainerText() {
+		
+		if(container.getListSize() == 0) {
+			for(int i = 0; i < 5; i++) {
+				containButton[i].setText("");
+			}
+		}
+		else {
+			for(int i = container.getStartNum(); i < container.getListSize(); i++) {
+				int j = i - container.getStartNum();
+				System.out.println("^^" + container.getStartNum());
+				containButton[j].setText(container.getWholeListToNum(i));
+				containButton[j].setVerticalTextPosition(JButton.CENTER);
+				containButton[j].setHorizontalTextPosition(JButton.CENTER);	
+				containButton[j].setFont(new Font("Arial", Font.BOLD, 18));
+			}
+		}
+		
 	}
 	
 	public void paint(Graphics g) {
