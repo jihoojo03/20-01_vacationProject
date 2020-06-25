@@ -47,9 +47,6 @@ public class GUITest extends JFrame {
 	private JLabel equationBox = new JLabel();
 	private JLabel calculateBox = new JLabel();
 	
-	private JLabel containBox = new JLabel();
-	private JLabel answerBox = new JLabel();
-
 	Calculate calculate = new Calculate();
 	Container container = new Container();
 	
@@ -899,13 +896,17 @@ public class GUITest extends JFrame {
 			}
 
 			@Override
-			public void mousePressed(MouseEvent e) {	
-				int currentNum = container.getStartNum();
-				calculate.setCurrentEquation(container.getAnswerListToNum(currentNum));
-				calculate.setCurrentValue(container.getAnswerListToNum(currentNum));
-				calculate.setIntermediateResult(Double.parseDouble(container.getAnswerListToNum(currentNum)));
-				setValueText();
-				setEquationText();
+			public void mousePressed(MouseEvent e) {
+				if(container.getListSize() >= 1) {
+					int currentNum = container.getStartNum();
+					calculate.setCurrentEquation(container.getEquationListToNum(currentNum));
+					calculate.setCurrentValue(container.getAnswerListToNum(currentNum));
+					calculate.setIntermediateResult(Double.parseDouble(container.getAnswerListToNum(currentNum)));
+					setValueText();
+					setEquationText();
+					calculate.setCurrentEquation("");
+					
+				}
 			}
 		});
 		add(containButton[0]);
@@ -926,7 +927,16 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {	
+				if(container.getListSize() >= 2) {
+					int currentNum = container.getStartNum() + 1;
+					calculate.setCurrentEquation(container.getEquationListToNum(currentNum));
+					calculate.setCurrentValue(container.getAnswerListToNum(currentNum));
+					calculate.setIntermediateResult(Double.parseDouble(container.getAnswerListToNum(currentNum)));
+					setValueText();
+					setEquationText();
+					calculate.setCurrentEquation("");
 				
+				}
 				
 			}
 		});
@@ -948,7 +958,16 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {	
-				
+				if(container.getListSize() >= 3) {
+					int currentNum = container.getStartNum() + 2;
+					calculate.setCurrentEquation(container.getEquationListToNum(currentNum));
+					calculate.setCurrentValue(container.getAnswerListToNum(currentNum));
+					calculate.setIntermediateResult(Double.parseDouble(container.getAnswerListToNum(currentNum)));
+					setValueText();
+					setEquationText();
+					calculate.setCurrentEquation("");
+					
+				}
 				
 			}
 		});
@@ -970,7 +989,16 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {	
-				
+				if(container.getListSize() >= 4) {
+					int currentNum = container.getStartNum() + 3;
+					calculate.setCurrentEquation(container.getEquationListToNum(currentNum));
+					calculate.setCurrentValue(container.getAnswerListToNum(currentNum));
+					calculate.setIntermediateResult(Double.parseDouble(container.getAnswerListToNum(currentNum)));
+					setValueText();
+					setEquationText();
+					calculate.setCurrentEquation("");
+					
+				}
 				
 			}
 		});
@@ -993,7 +1021,16 @@ public class GUITest extends JFrame {
 
 			@Override
 			public void mousePressed(MouseEvent e) {	
-				
+				if(container.getListSize() >= 5) {
+					int currentNum = container.getStartNum() + 4;
+					calculate.setCurrentEquation(container.getEquationListToNum(currentNum));
+					calculate.setCurrentValue(container.getAnswerListToNum(currentNum));
+					calculate.setIntermediateResult(Double.parseDouble(container.getAnswerListToNum(currentNum)));
+					setValueText();
+					setEquationText();
+					calculate.setCurrentEquation("");
+
+				}
 				
 			}
 		});
@@ -1033,11 +1070,11 @@ public class GUITest extends JFrame {
 		else {
 			for(int i = container.getStartNum(); i < container.getListSize(); i++) {
 				int j = i - container.getStartNum();
-				System.out.println("^^" + container.getStartNum());
 				containButton[j].setText(container.getWholeListToNum(i));
 				containButton[j].setVerticalTextPosition(JButton.CENTER);
 				containButton[j].setHorizontalTextPosition(JButton.CENTER);	
 				containButton[j].setFont(new Font("Arial", Font.BOLD, 18));
+				
 			}
 		}
 		
