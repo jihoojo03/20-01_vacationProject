@@ -5,10 +5,10 @@ import java.awt.Color;
 import javax.swing.JColorChooser;
 
 public class EdgeColor {
-	private Color edgeColor;
+	private static Color edgeColor;
 	
 	EdgeColor() {
-		this.edgeColor = Color.BLACK;
+		EdgeColor.edgeColor = Color.BLACK;
 	}
 	
 	public Color getEdgeColor() {
@@ -16,11 +16,11 @@ public class EdgeColor {
 	}
 
 	public void setEdgeColor(Color edgeColor) {
-		this.edgeColor = edgeColor;
+		EdgeColor.edgeColor = edgeColor;
 	}
 
 	public void changeEdgeColor() {
-		this.edgeColor = JColorChooser.showDialog(null, "Color Selector", edgeColor);
+		EdgeColor.edgeColor = JColorChooser.showDialog(null, "Color Selector", edgeColor);
 	}
 	
 

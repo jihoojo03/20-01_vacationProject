@@ -30,13 +30,13 @@ public class Bold {
 	}
 
 	public void changeBoldSize() {
-		if(boldSize >= 30) boldSize = 2;
+		if(boldSize >= 24) boldSize = 2;
 		else boldSize += 2;
 	}
 	
 	public void showFont() {
-		if(boldSize <= 10) font = new Font("³ª´®¹Ù¸¥°íµñ", Font.PLAIN, 16);
-		else if(boldSize <= 20) font = new Font("³ª´®¹Ù¸¥°íµñ", Font.PLAIN, 20);
+		if(boldSize <= 8) font = new Font("³ª´®¹Ù¸¥°íµñ", Font.PLAIN, 16);
+		else if(boldSize <= 16) font = new Font("³ª´®¹Ù¸¥°íµñ", Font.PLAIN, 20);
 		else font = new Font("³ª´®¹Ù¸¥°íµñ", Font.BOLD, 23);
 	}
 	

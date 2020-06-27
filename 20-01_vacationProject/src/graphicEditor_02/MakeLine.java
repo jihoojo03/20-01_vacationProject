@@ -8,22 +8,22 @@ import java.awt.geom.Line2D;
 
 import javax.swing.*;
 
-
 public class MakeLine extends JFrame {
 	
 	Point startP = null;
 	Point endP = null;
 	
 	MakeLine(){
-		setSize(300, 300);
+		setSize(GraphicEditorMain.SCREEN_WIDTH, GraphicEditorMain.SCREEN_HEIGHT - 130);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		makeUI();
+		setLocationRelativeTo(null);
+		setUndecorated(false);
 		setVisible(true);
 	}
 	
 	private void makeUI() {
 		MyPanel p = new MyPanel();
-		
 		
 		p.addMouseListener(new MouseAdapter() {
 			@Override
@@ -55,8 +55,10 @@ public class MakeLine extends JFrame {
 		protected void paintComponent(Graphics g) {
 
 			Graphics2D g2 = (Graphics2D)g;
-			g2.setStroke(new BasicStroke(30,BasicStroke.CAP_SQUARE,0));
+			g2.setStroke(new BasicStroke(30, BasicStroke.CAP_SQUARE, 0));
+			g2.setPaint(Color.BLACK);
 		    g2.draw(new Line2D.Double(100,100,200,100));
+		  
 			
 		}
 	}
