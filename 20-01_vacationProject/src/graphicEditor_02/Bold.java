@@ -8,7 +8,7 @@ public class Bold {
 	
 	Bold(){
 		font = new Font("³ª´®¹Ù¸¥°íµñ", Font.PLAIN, 20);
-		boldSize = 10;
+		boldSize = 6;
 	}
 	
 	public Font getFont() {
