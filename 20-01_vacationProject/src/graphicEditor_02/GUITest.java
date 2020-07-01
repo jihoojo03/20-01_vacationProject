@@ -73,7 +73,6 @@ public class GUITest extends JFrame {
 	private JLabel choiceBox = new JLabel();
 	private JLabel undoRedoBox = new JLabel();
 
-	
 	private Point startP = null;
 	private Point endP = null;
 	
