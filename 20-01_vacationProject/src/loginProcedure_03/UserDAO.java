@@ -41,6 +41,30 @@ public class UserDAO {
 		return -2; // DB 오류
 	}
 	
+	public String[] find(String userID) {
+		String user[] = new String[5];
+		String SQL = "SELECT * FROM USER WHERE userID = ?";
+		try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, userID);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				user[0] = rs.getString("userID");
+				user[1] = rs.getString("userPassword");
+				user[2] = rs.getString("userName");
+				user[3] = rs.getString("userBirth");
+				user[4] = rs.getString("userPhone");
+				return user; // 정보 확인
+			}
+			user[0] = "NoId";
+			return user;	// ID 없음
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		user[0] = "NoDB";
+		return user; // DB 오류
+	}
+	
 	public int join(User user) {
 		String SQL = "INSERT INTO USER VALUES (?, ?, ?, ?, ?)";
 		try {
@@ -127,6 +151,69 @@ public class UserDAO {
 			e.printStackTrace();
 		}
 		return -1;		// DB 오류
+	}
+	
+	public String findID(String userName, String userPhone) {
+		String SQL = "SELECT userID FROM USER WHERE userName = ? AND userPhone = ?";
+			try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, userName);
+			pstmt.setString(2, userPhone);
+			rs = pstmt.executeQuery();
+			String userID = new String();
+			if(rs.next()) {
+				userID = rs.getString("userID");
+				return userID; // 정보 확인
+			}
+			else{
+				userID = "NoID";
+				return userID;	// ID 없음
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		String userID = "DBError";
+		return userID;
+	}
+	
+	public String findPassword(String userID) {
+		String SQL = "SELECT userPassword FROM USER WHERE userID = ?";
+			try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, userID);
+			rs = pstmt.executeQuery();
+			String userPW = new String();
+			if(rs.next()) {
+				userPW = rs.getString("userPassword");
+				return userPW; // 정보 확인
+			}
+			else{
+				userPW = "NoPW";
+				return userPW;	// PW 없음
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		String userPW = "DBError";
+		return userPW;
+	}
+	
+	public int haveID(String userID) {
+		String SQL = "SELECT EXISTS (SELECT * FROM USER WHERE userID = ?) AS SUCCESS";
+			try {
+			pstmt = conn.prepareStatement(SQL);
+			pstmt.setString(1, userID);
+			rs = pstmt.executeQuery();
+			if(rs.next()) {
+				return rs.getInt("success");	// ID 있음
+			}
+			else{
+				return 0;	// ID 없음
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return -1; // DB 오류
 	}
 	
 }
