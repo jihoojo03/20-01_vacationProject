@@ -3,7 +3,7 @@ package connect6_05;
 public class GameAlgorithm {
 	private int amount;			// ÃÑ µ¹°¹¼ö
 	private int currentTurn;	// 0 : Èæ, 1 : ¹é
-	private int stone[][];		// -1 : default, 0 : Èæ, 1 : ¹é, 2 : Áß¸³µ¹, 3 : º®
+	private int stone[][];		// -1 : default, 0 : Èæ, 1 : ¹é, 2 : Áß¸³µ¹, 99 : º®
 			
 	GameAlgorithm(){
 		amount = 0;
@@ -62,7 +62,7 @@ public class GameAlgorithm {
 			currentTurn = 1;
 		}
 	}
-	
+
 	public int win(int x, int y) {
 		int highWin = 1;
 		
@@ -180,5 +180,43 @@ public class GameAlgorithm {
 			else return winCount(x + 1, y - 1, 8) + 1;
 		}
 		else return 300;
+	}
+	
+	public void reset() {
+		amount = 0;
+		currentTurn = 0;
+		
+		for(int i = 0; i < 21; i++) {
+			for(int j = 0; j < 21; j++) {
+				stone[i][j] = -1;
+			}
+		}
+		for(int i = 0; i < 21; i++) {
+			stone[i][0] = 99;
+			stone[0][i] = 99;
+			stone[i][20] = 99;
+			stone[20][i] = 99;
+		}
+	}
+	
+	public void resetGame() {
+		amount = 0;
+		currentTurn = 0;
+		
+		for(int i = 0; i < 21; i++) {
+			for(int j = 0; j < 21; j++) {
+				if(stone[i][j] == 0 || stone[i][j] == 1)
+					stone[i][j] = -1;
+			}
+		}
+	}
+	
+	public void show() {
+		for(int i = 0; i < 21; i++) {
+			for(int j = 0; j < 21; j++) {
+				System.out.print(stone[i][j] + " ");
+			}
+			System.out.println();
+		}
 	}
 }

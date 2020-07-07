@@ -4,7 +4,14 @@ public class GameOption {
 	private int boardImage;		// 0 : default, 1 : white, 2 : jihoon
 	private int player1Color;	// 0 : Èæ, 1 : ¹é, 2 : Ã», 3 : ³ë
 	private int player2Color;	// 0 : Èæ, 1 : ¹é, 2 : Ã», 3 : ³ë
-	private int timeLimit;		// 15s, 30s, 60s
+	private int timeLimit;		// 15 ~ 30s
+	
+	GameOption() {
+		boardImage = 0;
+		player1Color = 0;
+		player2Color = 0;
+		timeLimit = 15;
+	}
 	
 	public int getBoardImage() {
 		return boardImage;
