@@ -344,25 +344,27 @@ public class GameAlgorithm {
 					case 1:		// 한쪽 끝만 열린 경우
 						if(amount % 4 == 2 || amount % 4 == 0)
 							return 50000;
-						else return 1500;
+						else return 5000;
 					case 2:		// 양쪽 끝이 열린 경우
 						if(amount % 4 == 2 || amount % 4 == 0)
 							return 100000;
-						else return 2000;
+						else return 10000;
 				}
 			case 4:				// 돌 4개
 				switch (openEnds) {
 					case 1:		// 한쪽 끝만 열린 경우
 						return 50;
 					case 2:		// 양쪽 끝이 열린 경우
-						return 1000;
+						if(amount % 4 == 2 || amount % 4 == 0)
+							return 1000;
+						else return 5000;
 				}
 			case 3:				// 돌 3개
 				switch (openEnds) {
 					case 1:		// 한쪽 끝만 열린 경우
 						return 7;
 					case 2:		// 양쪽 끝이 열린 경우
-						return 20;
+						return 30;
 				}
 			case 2:				// 돌 2개
 				switch (openEnds) {
