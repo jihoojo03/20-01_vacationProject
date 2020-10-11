@@ -11,6 +11,7 @@ public class GameAlgorithm {
 	private int stone[][];		// -1 : default, 0 : 흑, 1 : 백, 2 : 중립돌, 99 : 벽
 	private int nextStone[][][];	// -1 : default, 0 : 흑, 1 : 백, 2 : 중립돌, 99 : 벽
 	private boolean isFirst;
+	private boolean isAttack;
 	
 	double[][] all1 = new double[21][21];
 	double[][] hor1 = new double[21][21];
@@ -35,6 +36,7 @@ public class GameAlgorithm {
 		amount = 0;
 		currentTurn = 0;
 		isFirst = true;
+		isAttack = true;
 		
 		stone = new int[21][21];
 		for(int i = 0; i < 21; i++) {
@@ -342,13 +344,20 @@ public class GameAlgorithm {
 						if(amount % 4 == 2 || amount % 4 == 0)
 							return 2000;
 					case 1:		// 한쪽 끝만 열린 경우
-						if(amount % 4 == 2 || amount % 4 == 0)
-							return 50000;
-						else return 5000;
+						if(amount % 4 == 2 || amount % 4 == 0) 	
+							return 5000;
+						else {
+							if(isAttack) return 25;
+							else return 10000;
+						}
+
 					case 2:		// 양쪽 끝이 열린 경우
 						if(amount % 4 == 2 || amount % 4 == 0)
 							return 100000;
-						else return 10000;
+						else {
+							if(isAttack) return 40;	
+							return 20000;
+						}	
 				}
 			case 4:				// 돌 4개
 				switch (openEnds) {
@@ -357,7 +366,8 @@ public class GameAlgorithm {
 					case 2:		// 양쪽 끝이 열린 경우
 						if(amount % 4 == 2 || amount % 4 == 0)
 							return 1000;
-						else return 5000;
+						else 
+							return 5000;
 				}
 			case 3:				// 돌 3개
 				switch (openEnds) {
@@ -369,21 +379,22 @@ public class GameAlgorithm {
 			case 2:				// 돌 2개
 				switch (openEnds) {
 					case 1:		// 한쪽 끝만 열린 경우
-						return TWO_OPEN1;
+						return 2;
 					case 2:		// 양쪽 끝이 열린 경우
-						return TWO_OPEN2;
+						return 10;
 				}
 			case 1:				// 돌 1개
 				switch (openEnds) {	
 					case 1:		// 한쪽 끝만 열린 경우
-						return ONE_OPEN1;
+						return 0.5;
 					case 2:		// 양쪽 끝이 열린 경우
-						return ONE_OPEN2;
+						return 1;
 				}
 			default:
 				return 0;
 		}
 	}
+
 	
 	public double analyzeHorizontalSets(int current_turn) {
 		double score = 0;
@@ -472,6 +483,7 @@ public class GameAlgorithm {
 		}
 		return score;
 	}
+	
 	
 	public double analyzeVerticalSets(int current_turn) {
 		double score = 0;
@@ -562,6 +574,7 @@ public class GameAlgorithm {
 		}
 		return score;
 	}
+	
 	
 	public double analyzeLeftDiagonalSets(int current_turn) {
 		double score = 0;
@@ -661,6 +674,7 @@ public class GameAlgorithm {
 		return score;
 	}
 	
+	
 	public double analyzeRightDiagonalSets(int current_turn) {
 		double score = 0;
 		int countConsecutive = 0;
@@ -758,7 +772,7 @@ public class GameAlgorithm {
 		}
 		return score;
 	}
-	
+
 	public void findOptimal() {
 		amount++;
 		System.out.println("Amount : " +amount);
@@ -781,6 +795,7 @@ public class GameAlgorithm {
 	}
 	
 	public boolean findConnect6Move() {
+		isAttack = true;
 		if(isFirst) {
 			for(int i = 1; i < 20; i++) {
 				for(int j = 1; j < 20; j++) {
@@ -873,6 +888,7 @@ public class GameAlgorithm {
 	}
 	
 	public boolean findDefenceMove() {
+		isAttack = false;
 		if(isFirst) {
 			for(int i = 1; i < 20; i++) {
 				for(int j = 1; j < 20; j++) {
@@ -979,6 +995,7 @@ public class GameAlgorithm {
 	}
 	
 	public boolean findAttackMove() {	
+		isAttack = true;
 		if(isFirst) {
 			double max = 0;
 			int maxX = 0;
@@ -1027,417 +1044,417 @@ public class GameAlgorithm {
 		
 	}
 	
-	public void minimax() {
-		amount++;
-		System.out.println("Amount : " +amount);
-		
-		resetNextStone();
-
-		if(findConnect6Move_min1()) {
-			System.out.println("나는 6개 무친 돌");
-			amount++;
-			System.out.println("Amount : " +amount);
-			findConnect6Move_min2();
-			System.out.println("나는 6개 무친 돌");
-			return;
-		}
-		else if(findDefenceMove_min()) {
-			System.out.println("나는 방어 무친 돌");
-		}
-		else if(findAttackMove_min()) {
-			System.out.println("나는 공격 무친 돌");
-		}
-		
-		
-	}
-	
-	public boolean findConnect6Move_min1() {
-		if(isFirst) {
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(stone[i][j] != -1) {			// 돌이면
-						all2[i][j] = -999;
-					}
-					else if(stone[i][j] == -1) {	// 빈칸이면
-						stone[i][j] = 1;
-						
-						hor2[i][j] = analyzeHorizontalSets(1);
-						ver2[i][j] = analyzeVerticalSets(1);
-						left2[i][j] = analyzeLeftDiagonalSets(1);
-						right2[i][j] = analyzeRightDiagonalSets(1);
-						all2[i][j] = hor2[i][j] + ver2[i][j] + left2[i][j] + right2[i][j];
-						
-						stone[i][j] = -1;
-					}
-					
-				}
-			}
-			
-			double max = 0.0;
-			int maxX = 0;
-			int maxY = 0;
-			
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(all2[i][j] > 50000 && all2[i][j] > max) {
-						max = all2[i][j];
-						maxX = i;
-						maxY = j;
-					}
-				} 
-			}
-			
-			System.out.println(maxX + " asdf " + maxY);
-			if(maxX != 0 && maxY != 0) {
-				nextX1 = maxX - 1;
-				nextY1 = maxY - 1;
-				System.out.println(nextX1 + " / " + nextY1);
-				stone[maxX][maxY] = 1;
-				return true;
-			}
-			
-		}
-		else {
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(stone[i][j] != -1) {
-						all1[i][j] = -999;
-					}
-					else if(stone[i][j] == -1) {
-						stone[i][j] = 0;
-						
-						hor1[i][j] = analyzeHorizontalSets(0);
-						ver1[i][j] = analyzeVerticalSets(0);
-						left1[i][j] = analyzeLeftDiagonalSets(0);
-						right1[i][j] = analyzeRightDiagonalSets(0);
-						all1[i][j] = hor1[i][j] + ver1[i][j] + left1[i][j] + right1[i][j];
-						
-						stone[i][j] = -1;
-					}
-					
-				}
-			}
-			
-			double max = 0.0;
-			int maxX = 0;
-			int maxY = 0;
-			
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(all1[i][j] > 50000 && all1[i][j] > max) {
-						max = all1[i][j];
-						maxX = i;
-						maxY = j;
-					}
-				} 
-			}
-			
-			if(maxX != 0 && maxY != 0) {
-				nextX1 = maxX - 1;
-				nextY1 = maxY - 1;
-				System.out.println(nextX1 + " / " + nextY1);
-				stone[maxX][maxY] = 0;
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean findConnect6Move_min2() {
-		if(isFirst) {
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(stone[i][j] != -1) {			// 돌이면
-						all2[i][j] = -999;
-					}
-					else if(stone[i][j] == -1) {	// 빈칸이면
-						stone[i][j] = 1;
-						
-						hor2[i][j] = analyzeHorizontalSets(1);
-						ver2[i][j] = analyzeVerticalSets(1);
-						left2[i][j] = analyzeLeftDiagonalSets(1);
-						right2[i][j] = analyzeRightDiagonalSets(1);
-						all2[i][j] = hor2[i][j] + ver2[i][j] + left2[i][j] + right2[i][j];
-						
-						stone[i][j] = -1;
-					}
-					
-				}
-			}
-			
-			double max = 0.0;
-			int maxX = 0;
-			int maxY = 0;
-			
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(all2[i][j] > 50000 && all2[i][j] > max) {
-						max = all2[i][j];
-						maxX = i;
-						maxY = j;
-					}
-				} 
-			}
-			
-			System.out.println(maxX + " asdf " + maxY);
-			if(maxX != 0 && maxY != 0) {
-				nextX2 = maxX - 1;
-				nextY2 = maxY - 1;
-				System.out.println(nextX2 + " / " + nextY2);
-				stone[maxX][maxY] = 1;
-				return true;
-			}
-			
-		}
-		else {
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(stone[i][j] != -1) {
-						all1[i][j] = -999;
-					}
-					else if(stone[i][j] == -1) {
-						stone[i][j] = 0;
-						
-						hor1[i][j] = analyzeHorizontalSets(0);
-						ver1[i][j] = analyzeVerticalSets(0);
-						left1[i][j] = analyzeLeftDiagonalSets(0);
-						right1[i][j] = analyzeRightDiagonalSets(0);
-						all1[i][j] = hor1[i][j] + ver1[i][j] + left1[i][j] + right1[i][j];
-						
-						stone[i][j] = -1;
-					}
-					
-				}
-			}
-			
-			double max = 0.0;
-			int maxX = 0;
-			int maxY = 0;
-			
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(all1[i][j] > 50000 && all1[i][j] > max) {
-						max = all1[i][j];
-						maxX = i;
-						maxY = j;
-					}
-				} 
-			}
-			
-			if(maxX != 0 && maxY != 0) {
-				nextX2 = maxX - 1;
-				nextY2 = maxY - 1;
-				System.out.println(nextX2 + " / " + nextY2);
-				stone[maxX][maxY] = 0;
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	public boolean findDefenceMove_min() {
-		if(isFirst) {
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(nextStone[0][i][j] != -1) {
-						all1[i][j] = -999;
-					}
-					else if(nextStone[0][i][j] == -1) {
-						nextStone[0][i][j] = 0;
-						
-						hor1[i][j] = analyzeHorizontalSets(0);
-						ver1[i][j] = analyzeVerticalSets(0);
-						left1[i][j] = analyzeLeftDiagonalSets(0);
-						right1[i][j] = analyzeRightDiagonalSets(0);
-						all1[i][j] = hor1[i][j] + ver1[i][j] + left1[i][j] + right1[i][j];
-						
-						nextStone[0][i][j] = -1;
-					}
-				}
-			}
-			
-			double max = 0.0;
-			double nextMax = 0.0;
-			int maxX = 0;
-			int maxY = 0;
-			int nextmaxX = 0;
-			int nextmaxY = 0;
-			
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(all1[i][j] > max) {
-						nextMax = max;
-						nextmaxX = maxX;
-						nextmaxY = maxY;
-						max = all1[i][j];
-						maxX = i;
-						maxY = j;
-					}
-				}
-			}
-			
-			System.out.println(maxX + " % " + maxY);
-			if(amount <= 5) {
-				nextX1 = maxX - 1;
-				nextY1 = maxY - 1;
-				nextX2 = nextmaxX - 1;
-				nextY2 = nextmaxY - 1;
-				nextStone[0][maxX][maxY] = 1;
-				nextStone[1][maxX][maxY] = 1;
-				nextStone[2][nextmaxX][nextmaxY] = 1;
-				nextStone[3][nextmaxX][nextmaxY] = 1;
-				return true;
-			}
-			if(max > minDefence) {
-				nextX1 = maxX - 1;
-				nextY1 = maxY - 1;
-				nextX2 = nextmaxX - 1;
-				nextY2 = nextmaxY - 1;
-				nextStone[0][maxX][maxY] = 1;
-				nextStone[1][maxX][maxY] = 1;
-				nextStone[2][nextmaxX][nextmaxY] = 1;
-				nextStone[3][nextmaxX][nextmaxY] = 1;
-				return true;
-			}
-			else {
-				return false;
-			}
-			
-		}
-		else {
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(nextStone[0][i][j] != -1) {
-						all2[i][j] = -999;
-					}
-					else if(nextStone[0][i][j] == -1) {
-						nextStone[0][i][j] = 1;
-						
-						hor2[i][j] = analyzeHorizontalSets(1);
-						ver2[i][j] = analyzeVerticalSets(1);
-						left2[i][j] = analyzeLeftDiagonalSets(1);
-						right2[i][j] = analyzeRightDiagonalSets(1);
-						all2[i][j] = hor2[i][j] + ver2[i][j] + left2[i][j] + right2[i][j];
-						
-						nextStone[0][i][j] = -1;
-					}
-				}
-			}
-			
-			double max = 0.0;
-			double nextMax = 0.0;
-			int maxX = 0;
-			int maxY = 0;
-			int nextmaxX = 0;
-			int nextmaxY = 0;
-			
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(all2[i][j] > max) {
-						nextMax = max;
-						nextmaxX = maxX;
-						nextmaxY = maxY;
-						max = all1[i][j];
-						maxX = i;
-						maxY = j;
-					}
-				}
-			}
-			
-			System.out.println(maxX + " % " + maxY);
-			if(amount <= 5) {
-				nextX1 = maxX - 1;
-				nextY1 = maxY - 1;
-				nextX2 = nextmaxX - 1;
-				nextY2 = nextmaxY - 1;
-				nextStone[0][maxX][maxY] = 0;
-				nextStone[1][maxX][maxY] = 0;
-				nextStone[2][nextmaxX][nextmaxY] = 0;
-				nextStone[3][nextmaxX][nextmaxY] = 0;
-				return true;
-			}
-			if(max > minDefence) {
-				nextX1 = maxX - 1;
-				nextY1 = maxY - 1;
-				nextX2 = nextmaxX - 1;
-				nextY2 = nextmaxY - 1;
-				nextStone[0][maxX][maxY] = 0;
-				nextStone[1][maxX][maxY] = 0;
-				nextStone[2][nextmaxX][nextmaxY] = 0;
-				nextStone[3][nextmaxX][nextmaxY] = 0;
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-	}
-	
-	public boolean findAttackMove_min() {	
-		if(isFirst) {
-			double max = 0;
-			int maxX = 0;
-			int maxY = 0;
-			
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(all2[i][j] > max) {
-						max = all2[i][j];
-						maxX = i;
-						maxY = j;
-					}
-				}
-			}
-			
-			System.out.println(maxX + " / " + maxY);
-			nextX1 = maxX - 1;
-			nextY1 = maxY - 1;
-			nextStone[0][maxX][maxY] = 1;
-			return true;
-
-		}
-		else {
-			
-			double max = 0;
-			int maxX = 0;
-			int maxY = 0;
-			
-			for(int i = 1; i < 20; i++) {
-				for(int j = 1; j < 20; j++) {
-					if(all1[i][j] > max) {
-						max = all1[i][j];
-						maxX = i;
-						maxY = j;
-					}
-				}
-			}
-			
-			System.out.println(maxX + " / " + maxY);
-			nextX1 = maxX - 1;
-			nextY1 = maxY - 1;
-			nextStone[0][maxX][maxY] = 0;
-			return true;
-
-		}
-		
-	}
-	
-	public void findScore() {
-		amount++;
-		setStone(10, 10, 0);
-		
-		while(true) {
-			findOptimal();
-			if(win(nextX1 + 1, nextX1 + 1) == 6) {
-				if(getCurrentTurn() == 0) {
-					System.out.println("P1 승리");
-				}
-				else if(getCurrentTurn() == 1) {
-					System.out.println("P2 승리");
-				}
-				break;
-			}
-		}
-	}
-	
+//	public void minimax() {
+//		amount++;
+//		System.out.println("Amount : " +amount);
+//		
+//		resetNextStone();
+//
+//		if(findConnect6Move_min1()) {
+//			System.out.println("나는 6개 무친 돌");
+//			amount++;
+//			System.out.println("Amount : " +amount);
+//			findConnect6Move_min2();
+//			System.out.println("나는 6개 무친 돌");
+//			return;
+//		}
+//		else if(findDefenceMove_min()) {
+//			System.out.println("나는 방어 무친 돌");
+//		}
+//		else if(findAttackMove_min()) {
+//			System.out.println("나는 공격 무친 돌");
+//		}
+//		
+//		
+//	}
+//	
+//	public boolean findConnect6Move_min1() {
+//		if(isFirst) {
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(stone[i][j] != -1) {			// 돌이면
+//						all2[i][j] = -999;
+//					}
+//					else if(stone[i][j] == -1) {	// 빈칸이면
+//						stone[i][j] = 1;
+//						
+//						hor2[i][j] = analyzeHorizontalSets(1);
+//						ver2[i][j] = analyzeVerticalSets(1);
+//						left2[i][j] = analyzeLeftDiagonalSets(1);
+//						right2[i][j] = analyzeRightDiagonalSets(1);
+//						all2[i][j] = hor2[i][j] + ver2[i][j] + left2[i][j] + right2[i][j];
+//						
+//						stone[i][j] = -1;
+//					}
+//					
+//				}
+//			}
+//			
+//			double max = 0.0;
+//			int maxX = 0;
+//			int maxY = 0;
+//			
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(all2[i][j] > 50000 && all2[i][j] > max) {
+//						max = all2[i][j];
+//						maxX = i;
+//						maxY = j;
+//					}
+//				} 
+//			}
+//			
+//			System.out.println(maxX + " asdf " + maxY);
+//			if(maxX != 0 && maxY != 0) {
+//				nextX1 = maxX - 1;
+//				nextY1 = maxY - 1;
+//				System.out.println(nextX1 + " / " + nextY1);
+//				stone[maxX][maxY] = 1;
+//				return true;
+//			}
+//			
+//		}
+//		else {
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(stone[i][j] != -1) {
+//						all1[i][j] = -999;
+//					}
+//					else if(stone[i][j] == -1) {
+//						stone[i][j] = 0;
+//						
+//						hor1[i][j] = analyzeHorizontalSets(0);
+//						ver1[i][j] = analyzeVerticalSets(0);
+//						left1[i][j] = analyzeLeftDiagonalSets(0);
+//						right1[i][j] = analyzeRightDiagonalSets(0);
+//						all1[i][j] = hor1[i][j] + ver1[i][j] + left1[i][j] + right1[i][j];
+//						
+//						stone[i][j] = -1;
+//					}
+//					
+//				}
+//			}
+//			
+//			double max = 0.0;
+//			int maxX = 0;
+//			int maxY = 0;
+//			
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(all1[i][j] > 50000 && all1[i][j] > max) {
+//						max = all1[i][j];
+//						maxX = i;
+//						maxY = j;
+//					}
+//				} 
+//			}
+//			
+//			if(maxX != 0 && maxY != 0) {
+//				nextX1 = maxX - 1;
+//				nextY1 = maxY - 1;
+//				System.out.println(nextX1 + " / " + nextY1);
+//				stone[maxX][maxY] = 0;
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+//	
+//	public boolean findConnect6Move_min2() {
+//		if(isFirst) {
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(stone[i][j] != -1) {			// 돌이면
+//						all2[i][j] = -999;
+//					}
+//					else if(stone[i][j] == -1) {	// 빈칸이면
+//						stone[i][j] = 1;
+//						
+//						hor2[i][j] = analyzeHorizontalSets(1);
+//						ver2[i][j] = analyzeVerticalSets(1);
+//						left2[i][j] = analyzeLeftDiagonalSets(1);
+//						right2[i][j] = analyzeRightDiagonalSets(1);
+//						all2[i][j] = hor2[i][j] + ver2[i][j] + left2[i][j] + right2[i][j];
+//						
+//						stone[i][j] = -1;
+//					}
+//					
+//				}
+//			}
+//			
+//			double max = 0.0;
+//			int maxX = 0;
+//			int maxY = 0;
+//			
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(all2[i][j] > 50000 && all2[i][j] > max) {
+//						max = all2[i][j];
+//						maxX = i;
+//						maxY = j;
+//					}
+//				} 
+//			}
+//			
+//			System.out.println(maxX + " asdf " + maxY);
+//			if(maxX != 0 && maxY != 0) {
+//				nextX2 = maxX - 1;
+//				nextY2 = maxY - 1;
+//				System.out.println(nextX2 + " / " + nextY2);
+//				stone[maxX][maxY] = 1;
+//				return true;
+//			}
+//			
+//		}
+//		else {
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(stone[i][j] != -1) {
+//						all1[i][j] = -999;
+//					}
+//					else if(stone[i][j] == -1) {
+//						stone[i][j] = 0;
+//						
+//						hor1[i][j] = analyzeHorizontalSets(0);
+//						ver1[i][j] = analyzeVerticalSets(0);
+//						left1[i][j] = analyzeLeftDiagonalSets(0);
+//						right1[i][j] = analyzeRightDiagonalSets(0);
+//						all1[i][j] = hor1[i][j] + ver1[i][j] + left1[i][j] + right1[i][j];
+//						
+//						stone[i][j] = -1;
+//					}
+//					
+//				}
+//			}
+//			
+//			double max = 0.0;
+//			int maxX = 0;
+//			int maxY = 0;
+//			
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(all1[i][j] > 50000 && all1[i][j] > max) {
+//						max = all1[i][j];
+//						maxX = i;
+//						maxY = j;
+//					}
+//				} 
+//			}
+//			
+//			if(maxX != 0 && maxY != 0) {
+//				nextX2 = maxX - 1;
+//				nextY2 = maxY - 1;
+//				System.out.println(nextX2 + " / " + nextY2);
+//				stone[maxX][maxY] = 0;
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
+//	
+//	public boolean findDefenceMove_min() {
+//		if(isFirst) {
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(nextStone[0][i][j] != -1) {
+//						all1[i][j] = -999;
+//					}
+//					else if(nextStone[0][i][j] == -1) {
+//						nextStone[0][i][j] = 0;
+//						
+//						hor1[i][j] = analyzeHorizontalSets(0);
+//						ver1[i][j] = analyzeVerticalSets(0);
+//						left1[i][j] = analyzeLeftDiagonalSets(0);
+//						right1[i][j] = analyzeRightDiagonalSets(0);
+//						all1[i][j] = hor1[i][j] + ver1[i][j] + left1[i][j] + right1[i][j];
+//						
+//						nextStone[0][i][j] = -1;
+//					}
+//				}
+//			}
+//			
+//			double max = 0.0;
+//			double nextMax = 0.0;
+//			int maxX = 0;
+//			int maxY = 0;
+//			int nextmaxX = 0;
+//			int nextmaxY = 0;
+//			
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(all1[i][j] > max) {
+//						nextMax = max;
+//						nextmaxX = maxX;
+//						nextmaxY = maxY;
+//						max = all1[i][j];
+//						maxX = i;
+//						maxY = j;
+//					}
+//				}
+//			}
+//			
+//			System.out.println(maxX + " % " + maxY);
+//			if(amount <= 5) {
+//				nextX1 = maxX - 1;
+//				nextY1 = maxY - 1;
+//				nextX2 = nextmaxX - 1;
+//				nextY2 = nextmaxY - 1;
+//				nextStone[0][maxX][maxY] = 1;
+//				nextStone[1][maxX][maxY] = 1;
+//				nextStone[2][nextmaxX][nextmaxY] = 1;
+//				nextStone[3][nextmaxX][nextmaxY] = 1;
+//				return true;
+//			}
+//			if(max > minDefence) {
+//				nextX1 = maxX - 1;
+//				nextY1 = maxY - 1;
+//				nextX2 = nextmaxX - 1;
+//				nextY2 = nextmaxY - 1;
+//				nextStone[0][maxX][maxY] = 1;
+//				nextStone[1][maxX][maxY] = 1;
+//				nextStone[2][nextmaxX][nextmaxY] = 1;
+//				nextStone[3][nextmaxX][nextmaxY] = 1;
+//				return true;
+//			}
+//			else {
+//				return false;
+//			}
+//			
+//		}
+//		else {
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(nextStone[0][i][j] != -1) {
+//						all2[i][j] = -999;
+//					}
+//					else if(nextStone[0][i][j] == -1) {
+//						nextStone[0][i][j] = 1;
+//						
+//						hor2[i][j] = analyzeHorizontalSets(1);
+//						ver2[i][j] = analyzeVerticalSets(1);
+//						left2[i][j] = analyzeLeftDiagonalSets(1);
+//						right2[i][j] = analyzeRightDiagonalSets(1);
+//						all2[i][j] = hor2[i][j] + ver2[i][j] + left2[i][j] + right2[i][j];
+//						
+//						nextStone[0][i][j] = -1;
+//					}
+//				}
+//			}
+//			
+//			double max = 0.0;
+//			double nextMax = 0.0;
+//			int maxX = 0;
+//			int maxY = 0;
+//			int nextmaxX = 0;
+//			int nextmaxY = 0;
+//			
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(all2[i][j] > max) {
+//						nextMax = max;
+//						nextmaxX = maxX;
+//						nextmaxY = maxY;
+//						max = all1[i][j];
+//						maxX = i;
+//						maxY = j;
+//					}
+//				}
+//			}
+//			
+//			System.out.println(maxX + " % " + maxY);
+//			if(amount <= 5) {
+//				nextX1 = maxX - 1;
+//				nextY1 = maxY - 1;
+//				nextX2 = nextmaxX - 1;
+//				nextY2 = nextmaxY - 1;
+//				nextStone[0][maxX][maxY] = 0;
+//				nextStone[1][maxX][maxY] = 0;
+//				nextStone[2][nextmaxX][nextmaxY] = 0;
+//				nextStone[3][nextmaxX][nextmaxY] = 0;
+//				return true;
+//			}
+//			if(max > minDefence) {
+//				nextX1 = maxX - 1;
+//				nextY1 = maxY - 1;
+//				nextX2 = nextmaxX - 1;
+//				nextY2 = nextmaxY - 1;
+//				nextStone[0][maxX][maxY] = 0;
+//				nextStone[1][maxX][maxY] = 0;
+//				nextStone[2][nextmaxX][nextmaxY] = 0;
+//				nextStone[3][nextmaxX][nextmaxY] = 0;
+//				return true;
+//			}
+//			else {
+//				return false;
+//			}
+//		}
+//	}
+//	
+//	public boolean findAttackMove_min() {	
+//		if(isFirst) {
+//			double max = 0;
+//			int maxX = 0;
+//			int maxY = 0;
+//			
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(all2[i][j] > max) {
+//						max = all2[i][j];
+//						maxX = i;
+//						maxY = j;
+//					}
+//				}
+//			}
+//			
+//			System.out.println(maxX + " / " + maxY);
+//			nextX1 = maxX - 1;
+//			nextY1 = maxY - 1;
+//			nextStone[0][maxX][maxY] = 1;
+//			return true;
+//
+//		}
+//		else {
+//			
+//			double max = 0;
+//			int maxX = 0;
+//			int maxY = 0;
+//			
+//			for(int i = 1; i < 20; i++) {
+//				for(int j = 1; j < 20; j++) {
+//					if(all1[i][j] > max) {
+//						max = all1[i][j];
+//						maxX = i;
+//						maxY = j;
+//					}
+//				}
+//			}
+//			
+//			System.out.println(maxX + " / " + maxY);
+//			nextX1 = maxX - 1;
+//			nextY1 = maxY - 1;
+//			nextStone[0][maxX][maxY] = 0;
+//			return true;
+//
+//		}
+//		
+//	}
+//	
+//	public void findScore() {
+//		amount++;
+//		setStone(10, 10, 0);
+//		
+//		while(true) {
+//			findOptimal();
+//			if(win(nextX1 + 1, nextX1 + 1) == 6) {
+//				if(getCurrentTurn() == 0) {
+//					System.out.println("P1 승리");
+//				}
+//				else if(getCurrentTurn() == 1) {
+//					System.out.println("P2 승리");
+//				}
+//				break;
+//			}
+//		}
+//	}
+//	
 }
